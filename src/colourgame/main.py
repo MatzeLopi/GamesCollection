@@ -29,6 +29,7 @@ class ColorGame:
 
     def __init__(
         self,
+        fields: int,
         number_colours: int,
         tries: int,
         time_out: int | None = None,
@@ -37,20 +38,17 @@ class ColorGame:
         """Initialize new game based on the number of colours and tries
 
         Args:
-            number_colours: Number of colours which should be picked
+            fields: Number of colours which should be picked
             tries: Number of tries to guess the correct colours
             time_out: (Optional) time limit per round
         """
         self._colours = list(Colour)[0:number_colours]
-        self._number_colours = number_colours
+        self._number_colours = fields
         self._tries = tries
         self._time_out = time_out
         self._guesses = []
-        self._respone = [[] for _ in range(self._tries)]
+        self._evaluations = []
         self._solution = self._create_solution(unique_colours)
-
-        print(self._solution)
-
         self._game_loop()
 
     def _create_solution(self, unique_colours: bool = False) -> list[Colour]:
@@ -102,7 +100,7 @@ class ColorGame:
                 colour_guess = [Colour[colour.replace(" ", "")] for colour in guess]
             except KeyError:
                 print("Please check the spelling of the colours and retry.")
-                self._cli_input()
+                return self._cli_input()
             return colour_guess
 
     def _cli_out(self, try_n: int) -> None:
@@ -120,7 +118,7 @@ class ColorGame:
         colour_string = ", ".join(str(colour.name) for colour in self._colours)
 
         print(
-            f"Please input {try_n + 1}. guess.\n Number of Positions: {self._number_colours} Colours Available: {colour_string}\n Please seperate the Colours with ','"
+            f"Number of Positions: {self._number_colours} \n Colours Available: {colour_string}\n Please seperate the Colours with ','. \n Please input {try_n + 1}. guess: "
         )
 
     def _game_loop(self) -> None:
@@ -133,9 +131,10 @@ class ColorGame:
         """
 
         # Get guess
-        for n in range(self._tries):
-            self._cli_out(n)
+        for try_n in range(self._tries):
+            self._cli_out(try_n)
             guess = self._cli_input()
+            self._guesses.append(guess)
             evaluation = []
 
             # Evaluate Guess
@@ -150,18 +149,19 @@ class ColorGame:
                     continue
 
             shuffle(evaluation)
+            self._evaluations.append(evaluation)
             if evaluation is not None and all(
                 result == "Correct Position" for result in evaluation
             ):
                 print("Winner Winner Chicken Dinner!")
                 break
             else:
-                print(evaluation)
-                continue
+                for i in range(try_n + 1):
+                    print(f"Guess {i}: \n {",".join(colour.value for colour in self._guesses[i])} \n {self._evaluations[i]}")
 
         print(f"The solution was: \n {self._solution}")
 
 
 if __name__ == "__main__":
-    new_game = ColorGame(4, 7, unique_colours=True)
+    new_game = ColorGame(4, 6, 7, unique_colours=True)
     print("Main")
