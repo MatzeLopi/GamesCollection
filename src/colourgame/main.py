@@ -2,8 +2,11 @@
 
 """
 
+import fastapi
+
 from enum import Enum
 from random import choice, shuffle
+
 
 
 class Colour(Enum):
