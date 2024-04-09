@@ -35,26 +35,32 @@ class ColorGame:
         fields: int,
         number_colours: int,
         tries: int,
-        time_out: int | None = None,
+        in_interface,
+        out_interface,
+        /
         unique_colours: bool = False,
     ) -> None:
-        """Initialize new game based on the number of colours and tries
+        """_summary_
 
         Args:
-            fields: Number of colours which should be picked
-            tries: Number of tries to guess the correct colours
-            time_out: (Optional) time limit per round
+            fields (int): Number of Fields which need to be guessed
+            number_colours (int): Number of Colours from which the solution can be picked
+            tries (int): Number of tries the user has to guess the solution
+            in_interface (_type_): Interface to get input from the user
+            out_interface (_type_): Interface to output the game state to the user
+            unique_colours (bool, optional): Game Setting, if colours should be unique. Defaults to False.
         """
         self._colours = list(Colour)[0:number_colours]
         self._number_colours = fields
         self._tries = tries
-        self._time_out = time_out
+        self._in_interface = in_interface
+        self._out_interface = out_interface
         self._guesses = []
         self._evaluations = []
-        self._solution = self._create_solution(unique_colours)
+        self._solution = self._generate_solution(unique_colours)
         self._game_loop()
 
-    def _create_solution(self, unique_colours: bool = False) -> list[Colour]:
+    def _generate_solution(self, unique_colours: bool = False) -> list[Colour]:
         """Create solution which needs to be guessed based on number_colours
 
         Args might be potential modifiers for the solution like only unique colours etc...
@@ -78,9 +84,12 @@ class ColorGame:
             assert len(solution) == self._number_colours
 
             return solution
+        
         # Raise error to handle infinite loop case
+        
         elif unique_colours:
             raise UniqueSolutionError
+        
         # Create Solution with different conditions
         else:
             return [choice(self._colours) for _ in range(self._number_colours)]
@@ -106,7 +115,7 @@ class ColorGame:
                 return self._cli_input()
             return colour_guess
 
-    def _cli_out(self, try_n: int) -> None:
+    def out(self, try_n: int) -> None:
         """Output logic to play the game using the CLI
 
         In first round output an initial string, after this output structured view
@@ -120,9 +129,10 @@ class ColorGame:
         """
         colour_string = ", ".join(str(colour.name) for colour in self._colours)
 
-        print(
-            f"Number of Positions: {self._number_colours} \n Colours Available: {colour_string}\n Please seperate the Colours with ','. \n Please input {try_n + 1}. guess: "
-        )
+        message = f"Number of Positions: {self._number_colours} \n Colours Available: {colour_string}\n Please seperate the Colours with ','. \n Please input {try_n + 1}. guess: "
+
+        self._out_interface.out(message)
+
 
     def _game_loop(self) -> None:
         """Main game loop
