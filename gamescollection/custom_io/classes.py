@@ -1,9 +1,15 @@
 from typing import Callable
 
 
-class CommandLineIO:
+class IO_Interface:
+    """Interface for Input/Output"""
+
+    pass
+
+
+class CL_Interface(IO_Interface):
     """
-    A class that provides input/output functionality for command line interfaces.
+    A class that provides input/output functionality for command line.
     """
 
     def out(self, message: str):
@@ -29,14 +35,8 @@ class CommandLineIO:
         return filter(input(message)) if filter else input(message)
 
 
-class RESTIO:
-    """Class to handle REST Interactions"""
+class REST_Interface(IO_Interface):
+    """Class to provide input/output functionality for REST API"""
 
-    pass
-
-
-test = CommandLineIO()
-
-test.out("Hello World")
-
-print(test.in_("Enter your name: "))
+    def __init__(self) -> None:
+        pass
