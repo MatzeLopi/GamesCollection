@@ -1,11 +1,12 @@
 from typing import Callable
 
+
 class CommandLineIO:
     """
     A class that provides input/output functionality for command line interfaces.
     """
 
-    def out(self, message:str):
+    def out(self, message: str):
         """
         Prints the given message to the console.
 
@@ -14,7 +15,7 @@ class CommandLineIO:
         """
         print(message)
 
-    def in_(self, message, filter:Callable=None):
+    def in_(self, message, filter: Callable = None):
         """
         Reads user input from the console.
 
@@ -29,9 +30,10 @@ class CommandLineIO:
 
 
 class RESTIO:
-    """ Class to handle REST Interactions
-    """
+    """Class to handle REST Interactions"""
+
     pass
+
 
 test = CommandLineIO()
 
