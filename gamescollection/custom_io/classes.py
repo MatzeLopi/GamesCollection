@@ -21,7 +21,7 @@ class CL_Interface(IO_Interface):
         """
         print(message)
 
-    def in_(self, message, filter: Callable = None):
+    def inp(self, message: str | None = None, filter: Callable = None):
         """
         Reads user input from the console.
 
@@ -32,7 +32,10 @@ class CL_Interface(IO_Interface):
         Returns:
             str: The user input.
         """
-        return filter(input(message)) if filter else input(message)
+        if message is None:
+            return filter(input()) if filter else input()
+        else:
+            return filter(input(message)) if filter else input(message)
 
 
 class REST_Interface(IO_Interface):
