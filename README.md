@@ -1,10 +1,16 @@
 # Games Collection
 
-Games are a fun way to try and learn new concepts in python. 
+Welcome to the Games Collection repository! 🎮
 
+Games are not only a source of entertainment but also a fantastic way to explore and practice new concepts, especially in Python. This repository is a treasure trove of classic strategy games implemented in Python, serving both as a playground for learning and a source of fun.
+
+**Games Included:**
+- Colour Game
+- Game of Hex
+- (more to come!)
 
 ## Setup
-To install the repo, navigate into the desired destination using the `cd` command. Run this command to clone the repo.
+Getting started with the Games Collection is a breeze. Follow these simple steps to set up the repository on your local machine:
 
 ```bash
 git clone https://github.com/MatzeLopi/GamesCollection
