@@ -2,6 +2,8 @@
 
 Welcome to the Games Collection repository! 🎮
 
+[Docs](https://matzelopi.github.io/GamesCollection/GamesCollection/gamescollection.html)
+
 Games are not only a source of entertainment but also a fantastic way to explore and practice new concepts, especially in Python. This repository is a treasure trove of classic strategy games implemented in Python, serving both as a playground for learning and a source of fun.
 
 **Games Included:**
