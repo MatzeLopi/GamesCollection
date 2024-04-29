@@ -1,9 +1,6 @@
-""" Module to implement the game logic for colour picking game
-
 """
-
-import fastapi
-
+Implementation of MasterCode
+"""
 from enum import Enum
 from random import choice, shuffle
 
@@ -28,8 +25,9 @@ class UniqueSolutionError(Exception):
 
 
 class ColorGame:
-    """Python implementation of the Colour Guessing Game"""
-
+    """
+    MasterCode Game Implementation
+    """
     def __init__(
         self,
         fields: int,
@@ -37,7 +35,7 @@ class ColorGame:
         tries: int,
         in_interface,
         out_interface,
-        /
+        *,
         unique_colours: bool = False,
     ) -> None:
         """_summary_
@@ -174,7 +172,3 @@ class ColorGame:
 
         print(f"The solution was: \n {self._solution}")
 
-
-if __name__ == "__main__":
-    new_game = ColorGame(4, 6, 7, unique_colours=True)
-    print("Main")

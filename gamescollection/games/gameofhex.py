@@ -531,7 +531,3 @@ class Hex:
             return Player.WHITE
         elif self._dfs(self._west, self._east, set(), player=Player.BLACK):
             return Player.BLACK
-
-
-cli = CL_Interface()
-hex = Hex(5, cli, cli)
