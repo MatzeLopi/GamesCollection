@@ -1,9 +1,9 @@
 """
 Implementation of MasterCode
 """
+
 from enum import Enum
 from random import choice, shuffle
-
 
 
 class Colour(Enum):
@@ -28,6 +28,7 @@ class ColorGame:
     """
     MasterCode Game Implementation
     """
+
     def __init__(
         self,
         fields: int,
@@ -82,12 +83,12 @@ class ColorGame:
             assert len(solution) == self._number_colours
 
             return solution
-        
+
         # Raise error to handle infinite loop case
-        
+
         elif unique_colours:
             raise UniqueSolutionError
-        
+
         # Create Solution with different conditions
         else:
             return [choice(self._colours) for _ in range(self._number_colours)]
@@ -131,7 +132,6 @@ class ColorGame:
 
         self._out_interface.out(message)
 
-
     def _game_loop(self) -> None:
         """Main game loop
 
@@ -168,7 +168,8 @@ class ColorGame:
                 break
             else:
                 for i in range(try_n + 1):
-                    print(f"Guess {i}: \n {",".join(colour.value for colour in self._guesses[i])} \n {self._evaluations[i]}")
+                    print(
+                        f"Guess {i}: \n {','.join(colour.value for colour in self._guesses[i])} \n {self._evaluations[i]}"
+                    )
 
         print(f"The solution was: \n {self._solution}")
-
