@@ -13,6 +13,7 @@ parent_dir = ospath.dirname(current_dir)
 parent_dir = ospath.dirname(parent_dir)
 path.append(parent_dir)
 
+
 from gamescollection.custom_io.classes import CL_Interface, IO_Interface
 
 if TYPE_CHECKING:
@@ -281,9 +282,27 @@ class Hex:
         Returns:
             np.array: Array of Tiles which are neighbors of the given Tile
         """
-        index = tile.x * self._size + tile.y
+        # Special cases -> Can be treated as normal tiles
+        if (
+            tile != self._virtual_tile
+            and tile != self._north
+            and tile != self._south
+            and tile != self._east
+            and tile != self._west
+        ):
+            index = tile.x * self._size + tile.y
+            neighbor_tiles = self._graph[index]
+        elif tile == self._north:
+            neighbor_tiles = [self._board[0, i] for i in range(self._size)]
+        elif tile == self._south:
+            neighbor_tiles = [self._board[self._size - 1, i] for i in range(self._size)]
+        elif tile == self._east:
+            neighbor_tiles = [self._board[i, self._size - 1] for i in range(self._size)]
+        elif tile == self._west:
+            neighbor_tiles = [self._board[i, 0] for i in range(self._size)]
+        else:
+            raise ValueError("Tile not in the graph")
 
-        neighbor_tiles = self._graph[index]
         if player:
             return np.array(
                 [
@@ -376,11 +395,13 @@ class Hex:
         self._game_loop()
 
     def _human_move(self) -> None:
-        """Logic to get input from Human to make move
+        """Method to get the input from a Human to make a move.
 
-        Will loop until a valid move is made.
+        The method relies on the input interface to get the move from the user and then makes the move on the board.
+        The move is then checked and only accepted if it is valid.
+
+        If the move is invalid, the user is prompted to make another move.
         """
-
         while True:
             self._out_interface.out("Please make a move: x y")
             try:
@@ -397,13 +418,15 @@ class Hex:
                     self._out_interface.out("Invalid Move.")
 
     def _game_loop(self):
-        if round == 1:
-            self._pi_rule()
-
+        """Game loop to play the game of Hex"""
         while not self._check_winner():
+            if self._round == 1:
+                self._pi_rule()
+
             if self._current_player == self._player:
                 self._human_move()
             else:
+                print(f"AI is thinking... This might take a second")
                 self._ai_move()
 
             self._print_board()
@@ -432,27 +455,29 @@ class Hex:
             for _ in range(self._simulations):
                 # Create Copy of the current game-state
                 temp_game = deepcopy(self)
-
                 temp_game._make_move(move.x, move.y, temp_game._current_player)
 
                 while not temp_game._check_winner():
                     legal_moves = temp_game._get_legal_moves()
+                    if not legal_moves:
+                        break
                     random_move = random.choice(legal_moves)
                     temp_game._make_move(
                         random_move.x, random_move.y, temp_game._current_player
                     )
-                temp_game._print_board()
+
                 if temp_game._winner == temp_game._ai:
                     move_score += 1
-                else:
+                elif temp_game._winner == temp_game._player:
                     move_score -= 1
-            print(move_score)
+                else:
+                    pass
             if move_score > best_score:
                 best_score = move_score
                 best_move = move
         self._make_move(best_move.x, best_move.y, self._current_player)
 
-    def pi_rule(self) -> None:
+    def _pi_rule(self) -> None:
         """Implementation of the PI rule in the game to make it fair for both players."""
         assert self._round == 1
 
@@ -528,7 +553,6 @@ class Hex:
         Returns:
             Player | bool: Player who won the game or False if there is no winner yet.
         """
-
         if self._dfs(self._north, self._south, set(), player=Player.WHITE):
             self._winner = Player.WHITE
             return True
@@ -537,6 +561,3 @@ class Hex:
             return True
         else:
             return False
-
-
-game = Hex(5, CL_Interface(), CL_Interface())
