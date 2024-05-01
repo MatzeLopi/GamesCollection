@@ -11,6 +11,9 @@ Games are not only a source of entertainment but also a fantastic way to explore
 - Game of Hex
 - (more to come!)
 
+Of these the following games are stable and bug free:
+- 
+
 ## Setup
 Getting started with the Games Collection is a breeze. Follow these simple steps to set up the repository on your local machine:
 
