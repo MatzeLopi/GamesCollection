@@ -11,8 +11,8 @@ Games are not only a source of entertainment but also a fantastic way to explore
 - Game of Hex
 - (more to come!)
 
-Of these the following games are stable and bug free:
-- 
+#### Of these the following games are stable and bug free:
+- Game of Hex
 
 ## Setup
 Getting started with the Games Collection is a breeze. Follow these simple steps to set up the repository on your local machine:
@@ -35,3 +35,6 @@ They can be installed by running:
 ```bash
 pip install -r requirements.txt
 ```
+
+### Game of Hex
+Hex is a two-player abstract strategy board game played on a hexagonal grid, usually in a rhombus shape. The game was invented independently by mathematicians Piet Hein and John Nash in the 1940s.
