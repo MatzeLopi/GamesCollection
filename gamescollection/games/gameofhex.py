@@ -5,6 +5,7 @@ from enum import Enum
 from typing import TYPE_CHECKING
 from sys import path
 from os import path as ospath
+from copy import deepcopy
 
 # Weird way to import the classes from the parent directory
 current_dir = ospath.dirname(ospath.relpath(__file__))
@@ -116,6 +117,7 @@ class Hex:
         self._player: Player
         self._ai: Player
         self._current_player: Player
+        self._winner: Player = Player.EMPTY
 
         # Special Tiles for the edges of the board
         self._north = Tile(-1, -2, Player.WHITE)
@@ -406,7 +408,7 @@ class Hex:
 
             self._print_board()
 
-        print(f"Player {self._check_winner()} won!")
+        print(f"Player {self._winner} won!")
 
     def _get_legal_moves(self) -> list[Tile]:
         """Get Legal Moves on the board
@@ -422,34 +424,32 @@ class Hex:
         # Run Monte carlo simulations to find the best move
         best_score: int = -1 * int(1e9)
         best_move: Tile | None = None
-        original_board = self._board.copy()
-        original_graph = self._graph.copy()
-        self._print_board()
+
         legal_moves: list[Tile] = self._get_legal_moves()
+
         for move in legal_moves:
             move_score: int = 0
-            self._board = original_board.copy()
-            self._graph = original_graph.copy()
-            self._print_board()
-            self._make_move(move.x, move.y, self._current_player)
-            for n in range(self._simulations):
-                print(n)
+            for _ in range(self._simulations):
+                # Create Copy of the current game-state
+                temp_game = deepcopy(self)
 
-                while not self._check_winner():
+                temp_game._make_move(move.x, move.y, temp_game._current_player)
+
+                while not temp_game._check_winner():
+                    legal_moves = temp_game._get_legal_moves()
                     random_move = random.choice(legal_moves)
-                    self._make_move(random_move.x, random_move.y, self._current_player)
-
-                if self._check_winner() == self._ai:
+                    temp_game._make_move(
+                        random_move.x, random_move.y, temp_game._current_player
+                    )
+                temp_game._print_board()
+                if temp_game._winner == temp_game._ai:
                     move_score += 1
                 else:
                     move_score -= 1
-
+            print(move_score)
             if move_score > best_score:
                 best_score = move_score
                 best_move = move
-            self._undo_move(move.x, move.y)
-        self._board = original_board
-        self._graph = original_graph
         self._make_move(best_move.x, best_move.y, self._current_player)
 
     def pi_rule(self) -> None:
@@ -501,6 +501,9 @@ class Hex:
         """
         neighbors = self._get_neighbors(current_node, player)
 
+        assert all(tile.player == player for tile in neighbors), "Player mismatch"
+        assert player != Player.EMPTY, "Player can't be EMPTY"
+
         if current_node == end_node:
             return True
 
@@ -525,9 +528,15 @@ class Hex:
         Returns:
             Player | bool: Player who won the game or False if there is no winner yet.
         """
-        if self._round < 2 * self._size - 1:
-            return False
-        elif self._dfs(self._north, self._south, set(), player=Player.WHITE):
-            return Player.WHITE
+
+        if self._dfs(self._north, self._south, set(), player=Player.WHITE):
+            self._winner = Player.WHITE
+            return True
         elif self._dfs(self._west, self._east, set(), player=Player.BLACK):
-            return Player.BLACK
+            self._winner = Player.BLACK
+            return True
+        else:
+            return False
+
+
+game = Hex(5, CL_Interface(), CL_Interface())
