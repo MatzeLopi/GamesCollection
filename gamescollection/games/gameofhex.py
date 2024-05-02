@@ -437,7 +437,7 @@ class Hex:
         """Get Legal Moves on the board
 
         Returns:
-            _type_: _description_
+            list: List of Tiles which are legal moves on the board
         """
         flattened_board = self._board.flatten()
         moves = [tile for tile in flattened_board if tile.player == Player.EMPTY]
@@ -545,13 +545,11 @@ class Hex:
 
             return False
 
-    def _check_winner(self) -> Player | bool:
+    def _check_winner(self) -> bool:
         """Method to check if there is a winner in the game.
 
-        Starts after the 2 * size - 1 round, since before that no player can win.
-
         Returns:
-            Player | bool: Player who won the game or False if there is no winner yet.
+            bool: Bool indicating if somebody won the game or not.
         """
         if self._dfs(self._north, self._south, set(), player=Player.WHITE):
             self._winner = Player.WHITE

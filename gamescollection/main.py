@@ -1,4 +1,7 @@
 from custom_io import classes
+
+# TODO: Fix the import statement
+
 import games
 import games.gameofhex
 
