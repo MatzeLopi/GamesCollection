@@ -5,9 +5,33 @@ Implementation of MasterCode
 from enum import Enum
 from random import choice, shuffle
 from copy import deepcopy
-
+from typing import Optional
 
 from custom_io.classes import CL_Interface, IO_Interface
+
+
+def string_filter(
+    string: str,
+    deliminator: Optional[str] = None,
+    stripper: Optional[str] = None,
+) -> list[str]:
+    """Helper function to filter string input
+
+    Args:
+        string (str): Input string which needs to be filtered
+        deliminator (Optional[str], optional): Deliminator to split the string. Defaults to ",".
+        stripper (Optional[str], optional): Stripper to remove unwanted characters. Defaults to " ".
+
+    Returns:
+        list[str]: Filrered list of strings
+    """
+    if deliminator is None:
+        deliminator = ","
+    if stripper is None:
+        stripper = " "
+    string_list = string.split(",")
+    string_list = [string.strip(" ") for string in string_list]
+    return string_list
 
 
 class Colour(Enum):
@@ -98,9 +122,47 @@ class ColorGame:
         else:
             return [choice(self._colours) for _ in range(self._number_colours)]
 
-    def _game_loop(self) -> None:
-        """Main game loop for MasterCode"""
+    def _get_guess(self) -> list[Colour]:
+        """Get the guess from the user
 
+        Returns:
+            list[Colour]: Guess from the user as a list of Colours
+        """
+        self._out_interface.out(
+            "Please enter your guess (Colours should be separated by ,):"
+        )
+        guess = self._in_interface.inp(filter=string_filter)
+        while len(guess) != self._number_colours:
+            self._out_interface.out(
+                "Invalid number of colours. Please try again. (Colours should be separated by ,)"
+            )
+            guess = self._in_interface.inp(filter=string_filter)
+
+        # Convert guess to Colour
+        try:
+            guess = [Colour[colour] for colour in guess]
+        except KeyError as e:
+            self._out_interface.out(
+                "Invalid colour. Please try again. (Colours should be separated by ,), Key Error: {e}"
+            )
+            return self._get_guess()
+        return guess
+
+    def check_winner(self) -> bool:
+        """Check if the user won the game"""
+        return False
+
+    def _game_loop(self) -> bool:
+        """Main game loop for MasterCode
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the user won, False if the user lost
+
+        """
+        print(self._solution)
         # Get guess
         for try_n in range(self._tries):
             self._out_interface.out(f"Tries left: {self._tries - try_n}")
@@ -115,12 +177,13 @@ class ColorGame:
                 self._out_interface.out(
                     f"Evaluation: {','.join(result for result in self._evaluations)}"
                 )
-
-            self._out_interface.out("Please enter your guess:")
-            guess = self._in_interface.inp()
+            # Get Guess
+            guess = self._get_guess()
             self._guesses.append(guess)
+
             evaluation = []
             temp_solution = deepcopy(self._solution)
+            assert len(guess) == self._number_colours
 
             # Evaluate Guess
             for index, colour in enumerate(guess):
@@ -135,13 +198,15 @@ class ColorGame:
 
             shuffle(evaluation)
             self._evaluations.append(evaluation)
-            if evaluation is not None and all(
+            if evaluation and all(
                 result == "Correct Position" for result in evaluation
             ):
-                print("Winner Winner Chicken Dinner!")
-                break
+                self._out_interface.out("You won!")
+                return True
             else:
-                print("Try again")
+                self._out_interface.out("Try again!")
 
-        print("Game Over!")
-        print(f"The solution was: \n {self._solution}")
+        self._out_interface.out("You lost!")
+        self._out_interface.out(f"The solution was: \n {self._solution}")
+
+        return False
