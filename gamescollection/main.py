@@ -2,7 +2,7 @@
 from sys import path as syspath
 from os import path as ospath
 
-current_dir = ospath.dirname(ospath.relpath(__file__))
+current_dir = ospath.dirname(ospath.abspath(__file__))
 syspath.append(current_dir)
 
 # Custom imports
