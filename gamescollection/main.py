@@ -2,8 +2,6 @@
 from sys import path as syspath
 from os import path as ospath
 
-import games.colourgame
-
 current_dir = ospath.dirname(ospath.relpath(__file__))
 syspath.append(current_dir)
 
