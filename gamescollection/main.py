@@ -1,9 +1,16 @@
-from custom_io import classes
+# Add parent directory to the path
+from sys import path as syspath
+from os import path as ospath
 
-# TODO: Fix the import statement
+import games.colourgame
 
+current_dir = ospath.dirname(ospath.relpath(__file__))
+syspath.append(current_dir)
+
+# Custom imports
 import games
 import games.gameofhex
+from custom_io import classes
 
 
 def main():
@@ -69,13 +76,50 @@ def main():
     while True:
         choice = input("Enter your choice: ")
         if choice == "1":
-            print("Not implemented yet")
+
+            print("You have selected Master Code")
+
+            print("Please enter the number of colours (max. 7):")
+            number_colours = int(input("Enter the number of colours: "))
+            while number_colours > 7 or number_colours < 1:
+                print("Invalid number of colours. Please try again.")
+                number_colours = int(input("Enter the number of colours: "))
+
+            print("Please enter the number of tries:")
+            tries = int(input("Enter the number of tries: "))
+            while tries < 1:
+                print("Invalid number of tries. Please try again.")
+                tries = int(input("Enter the number of tries: "))
+
+            print("Please enter the length of the code:")
+            code_length = int(input("Enter the length of the code: "))
+            while code_length < 1:
+                print("Invalid code length. Please try again.")
+                code_length = int(input("Enter the length of the code: "))
+
+            game = games.colourgame.ColorGame(
+                code_length,
+                number_colours,
+                tries,
+                in_interface=input_interface,
+                out_interface=output_interface,
+            )
             exit()
         elif choice == "2":
+
             print("You have selected Game of Hex")
+
             print("Please enter the size of the board:")
             size = int(input("Enter the size: "))
-            game = games.gameofhex.Hex(size, input_interface, output_interface)
+            while size < 1:
+                print("Invalid board size. Please try again.")
+                size = int(input("Enter the size: "))
+
+            game = games.gameofhex.Hex(
+                size,
+                input_interface,
+                output_interface,
+            )
             break
         elif choice == "3":
             print("Exiting...")

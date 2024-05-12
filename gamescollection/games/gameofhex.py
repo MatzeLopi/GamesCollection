@@ -3,18 +3,10 @@ import numpy as np
 import itertools as it
 from enum import Enum
 from typing import TYPE_CHECKING
-from sys import path
-from os import path as ospath
 from copy import deepcopy
 
-# Weird way to import the classes from the parent directory
-current_dir = ospath.dirname(ospath.relpath(__file__))
-parent_dir = ospath.dirname(current_dir)
-parent_dir = ospath.dirname(parent_dir)
-path.append(parent_dir)
 
-
-from gamescollection.custom_io.classes import CL_Interface, IO_Interface
+from custom_io.classes import CL_Interface, IO_Interface
 
 if TYPE_CHECKING:
     pass

@@ -4,6 +4,10 @@ Implementation of MasterCode
 
 from enum import Enum
 from random import choice, shuffle
+from copy import deepcopy
+
+
+from custom_io.classes import CL_Interface, IO_Interface
 
 
 class Colour(Enum):
@@ -34,8 +38,8 @@ class ColorGame:
         fields: int,
         number_colours: int,
         tries: int,
-        in_interface,
-        out_interface,
+        in_interface: IO_Interface,
+        out_interface: IO_Interface,
         *,
         unique_colours: bool = False,
     ) -> None:
@@ -60,15 +64,16 @@ class ColorGame:
         self._game_loop()
 
     def _generate_solution(self, unique_colours: bool = False) -> list[Colour]:
-        """Create solution which needs to be guessed based on number_colours
-
-        Args might be potential modifiers for the solution like only unique colours etc...
+        """Create solution which needs to be guessed based on number_colours and unique_colours.
 
         Args:
-            unique_colours: Bool to determin if the colours selected for the solution should be unique or not
+            unique_colours (bool, optional): If the colours should be unique. Defaults to False.
 
         Returns:
-            List of colours which represents the solution which needs to be guessed
+            list[Colour]: List of Colours which need to be guessed
+
+        Raises:
+            UniqueSolutionError: If unique_colours is True and the number of colours is less than the number of fields
         """
         # Create solution
         if unique_colours & self._number_colours <= len(self._colours):
@@ -93,60 +98,29 @@ class ColorGame:
         else:
             return [choice(self._colours) for _ in range(self._number_colours)]
 
-    def _cli_input(self) -> list[Colour]:
-        """Input logic to play the game using the CLI
-
-        Returns:
-            List of Colours representing one guess
-        """
-        user_input = input()
-        guess = user_input.split(",")
-        if len(guess) != self._number_colours:
-            print(
-                f"Expected a guess with {self._number_colours} colours, got {len(guess)}. \n Retry."
-            )
-            self._cli_input()
-        else:
-            try:
-                colour_guess = [Colour[colour.replace(" ", "")] for colour in guess]
-            except KeyError:
-                print("Please check the spelling of the colours and retry.")
-                return self._cli_input()
-            return colour_guess
-
-    def out(self, try_n: int) -> None:
-        """Output logic to play the game using the CLI
-
-        In first round output an initial string, after this output structured view
-
-        Args:
-            try_n: Number of the current try
-
-        Returns:
-            None
-
-        """
-        colour_string = ", ".join(str(colour.name) for colour in self._colours)
-
-        message = f"Number of Positions: {self._number_colours} \n Colours Available: {colour_string}\n Please seperate the Colours with ','. \n Please input {try_n + 1}. guess: "
-
-        self._out_interface.out(message)
-
     def _game_loop(self) -> None:
-        """Main game loop
-
-        Get user Input, Output the
-
-        Args:
-
-        """
+        """Main game loop for MasterCode"""
 
         # Get guess
         for try_n in range(self._tries):
-            self._cli_out(try_n)
-            guess = self._cli_input()
+            self._out_interface.out(f"Tries left: {self._tries - try_n}")
+            self._out_interface.out(
+                f"Colours: {','.join(colour.name for colour in self._colours)}"
+            )
+
+            for guess in self._guesses:
+                self._out_interface.out(
+                    f"Guess: {','.join(colour.value for colour in guess)}"
+                )
+                self._out_interface.out(
+                    f"Evaluation: {','.join(result for result in self._evaluations)}"
+                )
+
+            self._out_interface.out("Please enter your guess:")
+            guess = self._in_interface.inp()
             self._guesses.append(guess)
             evaluation = []
+            temp_solution = deepcopy(self._solution)
 
             # Evaluate Guess
             for index, colour in enumerate(guess):
@@ -154,8 +128,8 @@ class ColorGame:
                 if colour == self._solution[index]:
                     evaluation.append("Correct Position")
                 elif colour in self._solution:
-                    # TODO: FIX logic -> Curretly it does not count and evaluate the correct colour correctly...
                     evaluation.append("Correct Colour")
+                    temp_solution.remove(colour)
                 else:
                     continue
 
@@ -167,9 +141,7 @@ class ColorGame:
                 print("Winner Winner Chicken Dinner!")
                 break
             else:
-                for i in range(try_n + 1):
-                    print(
-                        f"Guess {i}: \n {','.join(colour.value for colour in self._guesses[i])} \n {self._evaluations[i]}"
-                    )
+                print("Try again")
 
+        print("Game Over!")
         print(f"The solution was: \n {self._solution}")

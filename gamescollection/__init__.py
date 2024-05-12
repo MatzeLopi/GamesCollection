@@ -11,10 +11,3 @@ This package contains the following modules:
 """
 
 
-def main():
-    print("Welcome to the gamescollection package!")
-    pass
-
-
-if __name__ == "__main__":
-    main()
